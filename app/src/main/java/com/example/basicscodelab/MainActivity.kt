@@ -13,8 +13,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material3.Button
 import androidx.compose.material3.ElevatedButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -43,6 +47,7 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
+
 @Composable
 fun MyApp(modifier: Modifier = Modifier) {
 
@@ -58,10 +63,32 @@ fun MyApp(modifier: Modifier = Modifier) {
 }
 
 @Composable
+fun IcBtnClick() {
+    val names = List(10) { "$it" }
+    Column() {
+        names.forEach {
+            Greeting(name = it)
+        }
+    }
+}
+
+@Composable
+fun ElvBtnClick() {
+    val names: List<String> = List(10) { "$it" }
+    LazyColumn() {
+        items(items = names) { name ->
+            Greeting(name = name)
+        }
+    }
+}
+
+@Composable
 fun OnboardingScreen(
     onContinueClicked: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    var showColumn by rememberSaveable { mutableStateOf(false) }
+    var showLazyColumn by rememberSaveable { mutableStateOf(false) }
 
     Column(
         modifier = modifier.fillMaxSize(),
@@ -75,6 +102,37 @@ fun OnboardingScreen(
         ) {
             Text("Continue")
         }
+
+        //Column vs lazyColumn
+        IconButton(onClick = {
+            showColumn = true
+            showLazyColumn = false
+        }) {
+            Icon(Icons.Filled.FavoriteBorder, contentDescription = "Column")
+        }
+
+        ElevatedButton(onClick = {
+            showColumn = false
+            showLazyColumn = true
+        }) {
+            Text(text = "Lazy Column")
+        }
+
+        Surface {
+            when {
+                showColumn == true && showLazyColumn == false -> IcBtnClick()
+                //lazy column
+                showColumn == false && showLazyColumn == true -> ElvBtnClick()
+            }
+
+//            if (showColumn) {
+//                IcBtnClick()
+//            } else {
+//                //lazy column
+//                ElvBtnClick()
+//            }
+        }
+
     }
 }
 
@@ -87,14 +145,6 @@ private fun Greetings(
         items(items = names) { name ->
             Greeting(name = name)
         }
-    }
-}
-
-@Preview(showBackground = true, widthDp = 320, heightDp = 320)
-@Composable
-fun OnboardingPreview() {
-    BasicsCodelabTheme {
-        OnboardingScreen(onContinueClicked = {})
     }
 }
 
@@ -115,21 +165,23 @@ private fun Greeting(name: String) {
         modifier = Modifier.padding(vertical = 4.dp, horizontal = 8.dp)
     ) {
         Row(modifier = Modifier.padding(24.dp)) {
-            Column(modifier = Modifier
-                .weight(1f)
-                .padding(bottom = extraPadding.coerceAtLeast(0.dp))
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(bottom = extraPadding.coerceAtLeast(0.dp))
             ) {
                 Text(text = "Hello, ")
-                Text(text = name, style = MaterialTheme.typography.headlineMedium.copy(
-                    fontWeight = FontWeight.ExtraBold
-                ))
+                Text(
+                    text = name, style = MaterialTheme.typography.headlineMedium.copy(
+                        fontWeight = FontWeight.ExtraBold
+                    )
+                )
             }
             ElevatedButton(
                 onClick = { expanded = !expanded }
             ) {
                 Text(if (expanded) "Show less" else "Show more")
             }
-
         }
     }
 }
@@ -147,5 +199,13 @@ fun DefaultPreview() {
 fun MyAppPreview() {
     BasicsCodelabTheme {
         MyApp(Modifier.fillMaxSize())
+    }
+}
+
+@Preview(showBackground = true, widthDp = 320, heightDp = 320)
+@Composable
+fun OnboardingPreview() {
+    BasicsCodelabTheme {
+        OnboardingScreen(onContinueClicked = {})
     }
 }
